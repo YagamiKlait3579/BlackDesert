@@ -109,8 +109,7 @@ Return
             case "Key", "Keys":
                 Loop, 10
                     GuiControl, DebugGui3: Text, Key_Gui%A_Index%, -
-        }
-        
+        } 
     }
 
 ;;;;;;;;;; Functions ;;;;;;;;;;
