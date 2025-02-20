@@ -59,3 +59,19 @@
         if (TimeType = "sec")
             Return Round((CounterAfter - Start) / Frequency, 3)
     }
+
+    WorldTimeStamp(ByRef StampName = "") {
+        ; Timestamp from Seconds since Jan 01 1970. (UTC)
+        DllCall("GetSystemTimeAsFileTime", "Int64P", A_Stamp)
+        Return StampName := A_Stamp - 116444736000000000
+    }
+
+    WorldTimePassed(Start, End = "", TimeType = "ms") {
+        DllCall("GetSystemTimeAsFileTime", "Int64P", CounterAfter)
+        CounterAfter := End != "" ? End : (CounterAfter - 116444736000000000)
+        if (TimeType = "ms")
+            Return Round(1000 * (CounterAfter - Start) / Frequency, 3)
+        if (TimeType = "sec")
+            Return Round((CounterAfter - Start) / Frequency, 3)
+    }
+

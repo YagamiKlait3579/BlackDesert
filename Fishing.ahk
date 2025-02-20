@@ -1,16 +1,20 @@
 ﻿;;;;;;;;;; Loading ;;;;;;;;;;
     #include %A_Scriptdir%\libs\BaseLibs\Header.ahk
-    ;#IfWinActive, 
-    ;global PWN := "" ; Program window name
+    #IfWinActive, Black Desert
+    global PWN := "Black Desert" ; Program window name
+    OnExit("BeforeExiting")
 
 ;;;;;;;;;; Setting ;;;;;;;;;;
 
-;;;;;;;;;; Variables ;;;;;;;;;;
-    ; A_GameWindow := fWinGetClientPos(PWN)
-    ;A_Window := fWinGetClientPos("Black Desert")
-    ;global Space_Cords    := [Round(A_Window.w * 0.4949), Round(A_Window.h * 0.0510), Round(A_Window.w * 0.5365), Round(A_Window.h * 0.0835)] ; [950 ,  55, 1030,  90]
-    ;global MG_Coords := [Round(A_Window.w * 0.5782), Round(A_Window.h * 0.3520), Round(A_Window.w * 0.5835), Round(A_Window.h * 0.3614)] ; [1110, 380, 1120, 390]
-    ;global Captcha_Cords  := [Round(A_Window.w * 0.4012), Round(A_Window.h * 0.3244), Round(A_Window.w * 0.7189), Round(A_Window.h * 0.3705)] ; [770 , 350, 1380, 400]
+;;;;;;;;;; Variables ;;;;;;;;;; 
+    ; EAR = Endo AutoRun
+    CheckingFiles(,"SavedSettings.ini")
+    LoadIniSection(FP_SavedSettings, "Fishing")
+    ;--------------------------------------------------
+    global gCellsLastActiveTime := []
+    Loop, 10
+        gCellsLastActiveTime.Push((CellLastActiveTime%A_Index% ? CellLastActiveTime%A_Index% : 0))
+    ;--------------------------------------------------
     global gCaptcha_Cords := []
     A_Width := Round((Captcha_Cords.3 - Captcha_Cords.1) / 10)
     Loop, 10
@@ -30,24 +34,15 @@
         gLoot_Coords2.Push([LS_Coords.1 + (A_Width * (A_Index - 1)), LS_Coords.2, LS_Coords.1 + (A_Width * A_Index), LS_Coords.2 + B_Height])
     Loop, 6
         gLoot_Coords2.Push([LS_Coords.1 + (A_Width * (A_Index - 1)), LS_Coords.2 + A_Height, LS_Coords.1 + (A_Width * A_Index), LS_Coords.2 + A_Height + B_Height])
-/* 
-    fBorder("Test1", {"Coords" : gLoot_Coords[1], "Color" : "Yellow"})
-    fBorder("Test2", {"Coords" : gLoot_Coords[2], "Color" : "Yellow"})
-    fBorder("Test3", {"Coords" : gLoot_Coords[3], "Color" : "Yellow"})
-    fBorder("Test4", {"Coords" : gLoot_Coords[4], "Color" : "Yellow"})
-    fBorder("Test5", {"Coords" : gLoot_Coords[5], "Color" : "Yellow"})
-    fBorder("Test6", {"Coords" : gLoot_Coords[6], "Color" : "Yellow"})
-    ;--------------------------------------------------
-    fBorder("Test7", {"Coords" : gLoot_Coords[7], "Color" : "Yellow"})
-    fBorder("Test8", {"Coords" : gLoot_Coords[8], "Color" : "Yellow"})
-    fBorder("Test9", {"Coords" : gLoot_Coords[9], "Color" : "Yellow"})
-    fBorder("Test10", {"Coords" : gLoot_Coords[10], "Color" : "Yellow"})
-    fBorder("Test11", {"Coords" : gLoot_Coords[11], "Color" : "Yellow"})
-    fBorder("Test12", {"Coords" : gLoot_Coords[12    ], "Color" : "Yellow"})
- */
 
-    ;;;;;;;;;; Hotkeys ;;;;;;;;;;
+    ErrorChecking()
+
+;;;;;;;;;; Hotkeys ;;;;;;;;;;
     Hotkey, *%StartKey%, BaseScript
+
+    Hotkey, *%TestAllGuiKey%, TestAllGui
+
+    
 
 ;;;;;;;;;; Gui ;;;;;;;;;;
     ; 🪝🎣🪨
@@ -64,11 +59,16 @@
         ;--------------------------------------------------
         Gui, MainInterface: Add, Text, xm y+m +Right vT2, %PlaceForTheText%
         GuiControl, MainInterface: Text, T2, Tools switching:
-        Gui, MainInterface: Add, Text, % " x+m w" (A_Width / 2) " +Center +Border cLime vToolsSwitching_Gui1",🪝 1
-        Gui, MainInterface: Add, Text, % " x+ w" ((A_Width + 1) / 2)  " +Center +Border cFuchsia vToolsSwitching_Gui2", Max: %TS_Amount%
+        Gui, MainInterface: Add, Text, % " x+m +Center +Border c" (TS_Flag ? "Lime" : "Red") " vToolsSwitching_Gui", %PlaceForTheText%
+        GuiControl, MainInterface: Text, ToolsSwitching_Gui, % (TS_Flag ? "Slot: " TS_Cells[1] : "Off")
         ;--------------------------------------------------
         Gui, MainInterface: Add, Text, xm y+m +Right vT3, %PlaceForTheText%
-        GuiControl, MainInterface: Text, T3, Fish sorting:
+        GuiControl, MainInterface: Text, T3, Auto buff:
+        Gui, MainInterface: Add, Text, % " x+m +Center +Border c" (AB_Flag ? "Lime" : "Red") " vAutoBuff_Gui", %PlaceForTheText%
+        GuiControl, MainInterface: Text, AutoBuff_Gui, % (AB_Flag ? "On" : "Off")
+        ;--------------------------------------------------
+        Gui, MainInterface: Add, Text, xm y+m +Right vT4, %PlaceForTheText%
+        GuiControl, MainInterface: Text, T4, Fish sorting:
         Gui, MainInterface: Add, Text, x+m +Center vFishSorting_Gui +Border, %PlaceForTheText%
         GuiControl, MainInterface: Text, FishSorting_Gui, % (LS_MinRarity = 3) ? "Legendary" : ((LS_MinRarity = 2) ? "Rare" : "All")
         GuiControl, % "MainInterface: +c" ((LS_MinRarity = 3) ? "Yellow" : ((LS_MinRarity = 2)? "Aqua" : "Lime")) " +Redraw", FishSorting_Gui
@@ -98,6 +98,8 @@
     }
     if HideTheInterface
         SetTimer, ShowHideGui , 250, -1
+    if AB_Flag
+        SetTimer, UpdatingBuffs, 250, -1
 Return
 
 ;;;;;;;;;; Gui functions ;;;;;;;;;;
@@ -110,6 +112,28 @@ Return
                 Loop, 10
                     GuiControl, DebugGui3: Text, Key_Gui%A_Index%, -
         } 
+    }
+
+    TestAllGui() {
+        global
+        local A_Loop, A_key
+        static B_Gui
+        B_Gui := !B_Gui
+        if B_Gui {
+            fBorder("WaitingForFishCatch", {"Coords" : Space_Cords, "Color" : "Yellow", "Size" : 2})
+            fBorder("MiniGame", {"Coords" : MG_Coords, "Color" : "Red"})
+            for A_Loop, A_key in gCaptcha_Cords
+                fBorder("fCaptcha" A_Loop, {"Coords" : A_key, "Color" : (Mod(A_Loop, 2) ? "Yellow" : "Lime" )})
+            for A_Loop, A_key in gLoot_Coords
+                fBorder("LootSorting" A_Loop, {"Coords" : A_key, "Color" : "Yellow"})
+        } Else {
+            fBorder("WaitingForFishCatch","Destroy")
+            fBorder("MiniGame","Destroy")
+            loop, 10
+                fBorder("fCaptcha" A_Index,"Destroy")
+            loop, 12
+                fBorder("LootSorting" A_Index,"Destroy")
+        }
     }
 
 ;;;;;;;;;; Functions ;;;;;;;;;;
@@ -130,6 +154,46 @@ Return
         fSetCursor(X1, Y1)
         lSleep(25)
         fMouseInput("Left")
+    }
+
+    ErrorChecking() {
+        global
+        local A_Loop, A_key, B_Loop, B_key
+        local HashArray := []
+        for A_Loop, A_key in [TS_Cells, AB_Cells]
+            for B_Loop, B_key in A_key {
+                if ((B_key > 10) || (B_key < 1)) {
+                    MsgBox, 16, Error settings fishing, % "Недопустимая ячейка " B_key " в настройках" ((A_Loop = 1) ? "''Tools switching''" : "''Auto buff''") "`nЯчейки должны иметь номер от 1 до 10."
+                    ExitApp
+                }
+                if (A_Loop = 1)
+                    HashArray[B_key] := true
+            }
+        for A_Loop, A_key in AB_Cells {
+            if (HashArray.HasKey(A_key)) {
+                MsgBox, 16, Error settings fishing, Ячейки в ''Tools switching'' и ''Auto buff'' не должны совпадать!`nСовпадают ячейки № %A_key%
+                ExitApp 
+            }
+        }     
+        if (AB_Cells.Count() > AB_Time.Count()) {
+            MsgBox, 16, Error settings fishing, % "Не для всех ячеек указан таймер в ''Auto buff''`nКоличество ячеек: " AB_Cells.Count() "`nКоличество таймеров: " AB_Time.Count()
+            ExitApp
+        }
+    }
+
+;;;;;;;;;; Additional functions ;;;;;;;;;;
+    UpdatingBuffs() {
+        global 
+        local A_Loop, A_key
+        for A_Loop, A_key in AB_Cells
+            if (AB_Time[A_Loop] < WorldTimePassed(gCellsLastActiveTime[A_key],,"sec")) {
+                if (A_key = 10)
+                    Send, {Blind}{0}
+                Else
+                    Send, {Blind}{%A_key%}
+                gCellsLastActiveTime[A_key] := WorldTimeStamp()
+                lSleep(500)
+            }     
     }
 
 ;;;;;;;;;; Fishing ;;;;;;;;;;
@@ -154,7 +218,7 @@ Return
                     lSleep(FishingRodCastingTime)
                     Send, {Blind}{Space Up}
                 }
-                if (TimePassed(B_Start,,"sec") > (TS_Time * TS_Amount)) {
+                if (TimePassed(B_Start,,"sec") > (TS_Time * TS_Cells.Count())) {
                     SetTimer, Fishing, off
                     GuiControl, MainInterface: Text, ScriptStatus_Gui, Error   %A_Hour%:%A_Min%
                     GuiControl, MainInterface: +cRed +Redraw, ScriptStatus_Gui
@@ -231,7 +295,7 @@ Return
             fBorder("LootSorting", {"Coords" : A_Coords, "Color" : "Yellow"})
             TimeStamp(A_Start)
             Loop, {
-                for B_Loop, B_key in ["Stone", "Key", "Sheet"] {
+                for B_Loop, B_key in ["Stone", "Key", "Sheet", "Bottle"] {
                     ImageSearch,,, A_Coords[1], A_Coords[2], A_Coords[3], A_Coords[4], % " *" LS_A_Image " HBITMAP:" ReadImages(CheckingFiles(,"BDO_Images.dll"), B_key)
                     if !ErrorLevel {
                         A_Loot.Push(B_key)
@@ -254,14 +318,14 @@ Return
             } 
             fBorder("LootSorting","Destroy")
         }
-        if FoundKeys.Length()
+        if A_Loot.Length()
             for A_Loop, A_key in A_Loot {
                 if A_key is integer 
                 {
                     if (A_key >= LS_MinRarity)
                         ClickOnAnLoot(gLoot_Coords[A_Loop])
                 } else {
-                    if (((A_key = "Stone") && LS_StoneFlag) || ((A_key = "Key") && LS_KeyFlag) || ((A_key = "Sheet") && LS_SheetFlag))
+                    if (((A_key = "Stone") && LS_StoneFlag) || ((A_key = "Key") && LS_KeyFlag) || ((A_key = "Sheet") && LS_SheetFlag) || ((A_key = "Bottle") && LS_BottleFlag))
                         ClickOnAnLoot(gLoot_Coords[A_Loop])
                 }
             }
@@ -274,11 +338,20 @@ Return
 ;;;;;;;;;; Additional functions ;;;;;;;;;;
     ToolsSwitching() {
         global
+        local A_key
         static A_Number 
-        if (A_Number >= TS_Amount)
+        if (A_Number >= TS_Cells.Length())
             A_Number := 1
         Else
             A_Number ++
-        GuiControl, MainInterface: Text, ToolsSwitching_Gui1, 🪝 %A_Number%
-        SendInput, {Blind}{%A_Number%}
+        GuiControl, MainInterface: Text, ToolsSwitching_Gui, % "Slot: " TS_Cells[1]
+        A_key := TS_Cells[A_Number]
+        SendInput, {Blind}{%A_key%}
+    }
+
+;;;;;;;;;; Exit ;;;;;;;;;;
+    BeforeExiting() {
+        global
+        for A_Loop, A_key in gCellsLastActiveTime
+            IniWrite, %A_key% , %FP_SavedSettings%, Fishing, % "CellLastActiveTime" A_Loop
     }
