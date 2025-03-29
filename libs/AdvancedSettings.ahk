@@ -4,10 +4,6 @@
 Если вы не уверены в значении параметра, оставьте его по умолчанию.
 */
 
-;;;;;;;;;; Advanced settings ;;;;;;;;;;
-EditAdvancedSettings := True
-
-
 ;;;;; Fishings settings (Настройки рыбалки) ;;;;;
     FT_Space         := "|<>*139$64.zzzzzzzzzzzsDzzzzzzzzy0Dzzzzzzzzswzzzzzzzzz7zzzzzzzzzwTzzzzzzzzzlzwkzUzkTUz7zk3s1y0w1y7z7brblvXby7wyTyDDyTDy7nszsszlwzyDDnk3Xz03zwwyC0CDw0Dznnslwszlzzz7DX7XXz7zzwwyQSDDyTzDXnllkwSsxw0T0DUHs3k7w7wVz3DsTkzzznzzzzzzzzzzDzzzzzzzzzwzzzzzzzzzznzzzzzzzzzzDzzzzzzzzzzzzzzzzzy"
     FT_A_Space       := 0.20

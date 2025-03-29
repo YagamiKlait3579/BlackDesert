@@ -1,5 +1,6 @@
 ﻿;;;;;;;;;; Loading ;;;;;;;;;;
-    #include %A_Scriptdir%\libs\BaseLibs\Header.ahk
+    #include %A_Scriptdir%\libs\CoreLibsFor_AHK\BaseLibs\Header.ahk
+    ;--------------------------------------------------
     #IfWinActive, Black Desert
     global PWN := "Black Desert" ; Program window name
     OnExit("BeforeExiting")
