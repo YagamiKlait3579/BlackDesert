@@ -3,6 +3,7 @@
     ;--------------------------------------------------
     #IfWinActive, Black Desert
     global PWN := "Black Desert" ; Program window name
+    CheckForUpdates("YagamiKlait3579", "BlackDesert", "main", CheckingFiles("File", False, "Header.ahk"))
     OnExit("BeforeExiting")
 
 ;;;;;;;;;; Setting ;;;;;;;;;;
