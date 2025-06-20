@@ -294,8 +294,8 @@ Return
             fBorder("LootSorting", {"Coords" : A_Coords, "Color" : "Yellow"})
             TimeStamp(A_Start)
             Loop, {
-                for B_Loop, B_key in ["Stone", "Key", "Sheet", "Bottle"] {
-                    ImageSearch,,, A_Coords[1], A_Coords[2], A_Coords[3], A_Coords[4], % " *" LS_A_Image " HBITMAP:" ReadImages(CheckingFiles(,"BDO_Images.dll"), B_key)
+                for B_Loop, B_key in ["Stone", "Key", "Sheet", "Bottle"] { 
+                    ImageSearch,,, A_Coords[1], A_Coords[2], A_Coords[3], A_Coords[4], % " *" LS_A_Image " HBITMAP:" ReadImages(CheckingFiles("File", False, "BDO_Images.ini"), B_key)
                     if !ErrorLevel {
                         A_Loot.Push(B_key)
                         GuiControl, DebugGui2: +cFuchsia +Redraw, % "LastFish_Gui" A_Loop
