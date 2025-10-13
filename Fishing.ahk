@@ -9,7 +9,6 @@
 ;;;;;;;;;; Setting ;;;;;;;;;;
 
 ;;;;;;;;;; Variables ;;;;;;;;;; 
-    ; EAR = Endo AutoRun
     LoadIniSection(CheckingFiles("File", True, "SavedSettings.ini"), "Fishing")
     ;--------------------------------------------------
     global gCellsLastActiveTime := []
@@ -39,7 +38,7 @@
     ErrorChecking()
 
 ;;;;;;;;;; Hotkeys ;;;;;;;;;;
-    Hotkey, *%StartKey%, BaseScript
+    Hotkey, *%StartKey%, Main
 
     Hotkey, *%TestAllGuiKey%, TestAllGui
 
@@ -136,12 +135,11 @@ Return
     }
 
 ;;;;;;;;;; Functions ;;;;;;;;;;
-    BaseScript() {
+    Main() {
         static A_ScriptStatus
         if !A_ScriptStatus {
             A_ScriptStatus := !A_ScriptStatus
-            GuiControl, MainInterface: Text, ScriptStatus_Gui, Enabled
-            GuiControl, MainInterface: +cLime +Redraw, ScriptStatus_Gui
+            GuiInGame("Edit", "MainInterface", {"id" : "ScriptStatus_Gui", "Color" : "Lime", "Text" : "Enabled"})
             SetTimer, Fishing, 1
         } else
             Reload
@@ -219,15 +217,13 @@ Return
                 }
                 if (TimePassed(B_Start,,"sec") > (TS_Time * TS_Cells.Count())) {
                     SetTimer, Fishing, off
-                    GuiControl, MainInterface: Text, ScriptStatus_Gui, Error   %A_Hour%:%A_Min%
-                    GuiControl, MainInterface: +cRed +Redraw, ScriptStatus_Gui
+                    GuiInGame("Edit", "MainInterface", {"id" : "ScriptStatus_Gui", "Color" : "Red", "Text" : "Error   " A_Hour ":" A_Min})
                     fBorder("WaitingForFishCatch","Destroy")
                     Return 1
                 }
             } else if (TimePassed(B_Start,,"sec") > TS_Time) {
                 SetTimer, Fishing, off
-                GuiControl, MainInterface: Text, ScriptStatus_Gui, Error   %A_Hour%:%A_Min%
-                GuiControl, MainInterface: +cRed +Redraw, ScriptStatus_Gui
+                GuiInGame("Edit", "MainInterface", {"id" : "ScriptStatus_Gui", "Color" : "Red", "Text" : "Error   " A_Hour ":" A_Min})
                 fBorder("WaitingForFishCatch","Destroy")
                 Return 1
             }
@@ -352,5 +348,5 @@ Return
     BeforeExiting() {
         global
         for A_Loop, A_key in gCellsLastActiveTime
-            IniWrite, %A_key% , %OP_SavedSettings%, Fishing, % "CellLastActiveTime" A_Loop
+            IniWrit90e, %A_key% , %OP_SavedSettings%, Fishing, % "CellLastActiveTime" A_Loop
     }

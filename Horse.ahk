@@ -12,7 +12,7 @@
     A_sleep := NumberOfJerks * 1000 
 
 ;;;;;;;;;; Hotkeys ;;;;;;;;;;
-    Hotkey, *%StartKey%, BaseScript
+    Hotkey, *%StartKey%, Main
 
 ;;;;;;;;;; Gui ;;;;;;;;;;
     PlaceForTheText := " Disabled "
@@ -29,9 +29,8 @@
 Return
 
 ;;;;;;;;;; Scripts ;;;;;;;;;;
-    BaseScript:
-        GuiControl, MainInterface: Text, ScriptStatus_Gui, Enabled
-	    GuiControl, MainInterface: +cLime +Redraw, ScriptStatus_Gui
+    Main:
+        GuiInGame("Edit", "MainInterface", {"id" : "ScriptStatus_Gui", "Color" : "Lime", "Text" : "Enabled"})
         Send, {Blind}{w Down}{Shift Down}
         lSleep(2000)
         Send, {Blind}{w Up}{Shift Up}
@@ -47,8 +46,7 @@ Return
             }
         }
         Send, {Blind}{w Up}{a Up}{s Up}{d Up}{f Up}
-        GuiControl, MainInterface: Text, ScriptStatus_Gui, Disabled
-        GuiControl, MainInterface: +cRed +Redraw, ScriptStatus_Gui
+        GuiInGame("Edit", "MainInterface", {"id" : "ScriptStatus_Gui", "Color" : "Red", "Text" : "Disabled"})
     Return
 
 ;;;;;;;;;; Exit ;;;;;;;;;;
