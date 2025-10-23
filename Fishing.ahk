@@ -348,5 +348,5 @@ Return
     BeforeExiting() {
         global
         for A_Loop, A_key in gCellsLastActiveTime
-            IniWrit90e, %A_key% , %OP_SavedSettings%, Fishing, % "CellLastActiveTime" A_Loop
+            IniWrite, %A_key% , %OP_SavedSettings%, Fishing, % "CellLastActiveTime" A_Loop
     }
